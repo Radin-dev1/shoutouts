@@ -33,8 +33,25 @@ Only the form owner can do this part.
    - Event type: `On form submit`
 9. Submit a test response.
 
-If your form question titles are different, update the title lists in
+This script already matches the current form questions:
+
+- `your Name`
+- `how much do you want to shout them out`
+- `Untitled Title`
+- `shoutout somebody/something`
+
+If you rename the form questions later, update the title lists in
 `formResponseToShoutout_` so they match the exact Google Form questions.
+
+## If responses still do not show
+
+In Apps Script, open **Executions** and click the failed run. The most common
+issues are:
+
+- `Missing script property: GITHUB_TOKEN`: add the token in **Project Settings > Script properties**.
+- `GitHub API error 401`: the token is wrong or expired.
+- `GitHub API error 403`: the token does not have **Contents: Read and write** access for this repo.
+- No execution appears: the form submit trigger was not created.
 
 ## Why visitors cannot delete notes
 

@@ -26,13 +26,15 @@ function renderNote(shoutout, index) {
   const message = cleanText(shoutout.message || shoutout.shoutout);
   const recipient = cleanText(shoutout.recipient || shoutout.to);
   const sender = cleanText(shoutout.sender || shoutout.from, "Anonymous");
+  const intensity = cleanText(shoutout.intensity || shoutout.rating);
   const date = formatDate(shoutout.createdAt || shoutout.timestamp);
 
   node.style.setProperty("--note-color", colors[index % colors.length]);
   node.style.setProperty("--tilt", tilts[index % tilts.length]);
   node.querySelector(".message").textContent = recipient ? `${recipient}: ${message}` : message;
   node.querySelector(".from").textContent = `From ${sender}`;
-  node.querySelector(".date").textContent = date;
+  node.querySelector(".date").textContent = intensity ? `${intensity}/10` : date;
+  node.title = date ? `Posted ${date}` : "";
 
   return node;
 }

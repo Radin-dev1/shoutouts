@@ -9,23 +9,45 @@ const CONFIG = {
 };
 
 function onFormSubmit(event) {
-  const response = formResponseToShoutout_(event);
-  if (!response.message) {
-    return;
-  }
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
 
-  appendShoutout_(response);
+  try {
+    const response = formResponseToShoutout_(event);
+    if (!response.message) {
+      throw new Error("No shoutout message found. Check the question titles in Code.gs.");
+    }
+
+    appendShoutout_(response);
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 function formResponseToShoutout_(event) {
   const named = event.namedValues || {};
+  const fallbackMessage = longestAnswer_(named);
 
   return {
     id: Utilities.getUuid(),
     createdAt: new Date().toISOString(),
-    sender: firstAnswer_(named, ["Your name", "Name", "From", "Who are you?"]) || "Anonymous",
-    recipient: firstAnswer_(named, ["Who are you shouting out?", "Recipient", "To", "Shoutout to"]),
-    message: firstAnswer_(named, ["Shoutout", "Message", "What do you want to say?", "Response"]),
+    sender: firstAnswer_(named, ["your Name", "Your name", "Name", "From", "Who are you?"]) || "Anonymous",
+    recipient: firstAnswer_(named, [
+      "Who are you shouting out?",
+      "Recipient",
+      "To",
+      "Shoutout to",
+    ]),
+    intensity: firstAnswer_(named, ["how much do you want to shout them out", "Intensity", "Rating"]),
+    message:
+      firstAnswer_(named, [
+        "Untitled Title",
+        "shoutout somebody/something",
+        "Shoutout",
+        "Message",
+        "What do you want to say?",
+        "Response",
+      ]) || fallbackMessage,
   };
 }
 
@@ -38,6 +60,23 @@ function firstAnswer_(namedValues, possibleQuestionTitles) {
   }
 
   return "";
+}
+
+function longestAnswer_(namedValues) {
+  let best = "";
+  for (const title in namedValues) {
+    const value = namedValues[title] && namedValues[title][0] ? String(namedValues[title][0]).trim() : "";
+    if (
+      value.length > best.length &&
+      title !== "Timestamp" &&
+      title !== "your Name" &&
+      title !== "how much do you want to shout them out"
+    ) {
+      best = value;
+    }
+  }
+
+  return best;
 }
 
 function appendShoutout_(shoutout) {
