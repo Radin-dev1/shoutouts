@@ -1,5 +1,6 @@
 const wall = document.querySelector("#wall");
 const statusEl = document.querySelector("#wallStatus");
+const setupNotice = document.querySelector("#setupNotice");
 const template = document.querySelector("#noteTemplate");
 
 const colors = ["#ffe177", "#ffb3ba", "#b9fbc0", "#a0c4ff", "#ffd6a5", "#cdb4db"];
@@ -61,10 +62,12 @@ async function loadWall() {
       empty.className = "empty";
       empty.textContent = "No shoutouts yet. Be the first to add one.";
       wall.append(empty);
+      setupNotice.hidden = false;
       statusEl.textContent = "Ready for the first shoutout.";
       return;
     }
 
+    setupNotice.hidden = true;
     visibleShoutouts.forEach((shoutout, index) => {
       wall.append(renderNote(shoutout, index));
     });

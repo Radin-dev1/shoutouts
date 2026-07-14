@@ -89,6 +89,27 @@ h1 {
   font-weight: 650;
 }
 
+.setup-notice {
+  margin: 4px 0 22px;
+  padding: 16px 18px;
+  border: 1px solid rgba(197, 91, 37, 0.28);
+  border-left: 6px solid #c55b25;
+  border-radius: 8px;
+  background: rgba(255, 250, 240, 0.86);
+}
+
+.setup-notice h2 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.setup-notice p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 650;
+  line-height: 1.45;
+}
+
 .wall {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
