@@ -5,10 +5,8 @@ const template = document.querySelector("#noteTemplate");
 
 const colors = ["#ffe177", "#ffb3ba", "#b9fbc0", "#a0c4ff", "#ffd6a5", "#cdb4db"];
 const tilts = ["-1.6deg", "1.2deg", "-0.8deg", "1.8deg", "-1.1deg", "0.7deg"];
-const dataUrl =
-  location.hostname.endsWith("github.io")
-    ? "/shoutouts/data/shoutouts.json"
-    : "data/shoutouts.json";
+const sheetId = "1cOYX_POgtHxzt_WYxFEv1JxXOwP-9ASPYn1Ze_FCI1Q";
+const sheetGid = "84917661";
 
 function cleanText(value, fallback = "") {
   return String(value || fallback).trim();
@@ -46,15 +44,7 @@ function renderNote(shoutout, index) {
 
 async function loadWall() {
   try {
-    const response = await fetch(`${dataUrl}?ts=${Date.now()}`, {
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      throw new Error(`Could not load shoutouts (${response.status})`);
-    }
-
-    const shoutouts = await response.json();
+    const shoutouts = await loadSheetShoutouts();
     const visibleShoutouts = shoutouts
       .filter((item) => cleanText(item.message || item.shoutout))
       .sort((a, b) => new Date(b.createdAt || b.timestamp) - new Date(a.createdAt || a.timestamp));
@@ -86,3 +76,65 @@ async function loadWall() {
 }
 
 loadWall();
+
+function loadSheetShoutouts() {
+  return new Promise((resolve, reject) => {
+    const callbackName = `handleShoutouts_${Date.now()}_${Math.random()
+      .toString(36)
+      .slice(2)}`;
+    const script = document.createElement("script");
+    const query = "select A,B,C,D";
+    const src = new URL(`https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq`);
+    src.searchParams.set("gid", sheetGid);
+    src.searchParams.set("tq", query);
+    src.searchParams.set("tqx", `out:json;responseHandler:${callbackName}`);
+
+    window[callbackName] = (response) => {
+      cleanup();
+
+      if (response.status !== "ok") {
+        reject(new Error(response.errors?.[0]?.detailed_message || "Google Sheet returned an error"));
+        return;
+      }
+
+      resolve(sheetRowsToShoutouts(response.table));
+    };
+
+    script.onerror = () => {
+      cleanup();
+      reject(new Error("Could not load the Google Sheet"));
+    };
+
+    function cleanup() {
+      delete window[callbackName];
+      script.remove();
+    }
+
+    script.src = src.toString();
+    document.head.append(script);
+  });
+}
+
+function sheetRowsToShoutouts(table) {
+  return (table.rows || []).map((row, index) => {
+    const cells = row.c || [];
+    return {
+      id: `sheet-${index}`,
+      createdAt: googleDateToIso(cells[0]?.v),
+      sender: cells[1]?.v || "Anonymous",
+      intensity: cells[2]?.v,
+      message: cells[3]?.v || "",
+    };
+  });
+}
+
+function googleDateToIso(value) {
+  const match = String(value || "").match(
+    /^Date\((\d+),(\d+),(\d+),(\d+),(\d+),(\d+)\)$/
+  );
+
+  if (!match) return value;
+
+  const [, year, month, day, hour, minute, second] = match.map(Number);
+  return new Date(year, month, day, hour, minute, second).toISOString();
+}

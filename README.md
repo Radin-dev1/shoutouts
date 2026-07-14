@@ -1,8 +1,8 @@
 # Shoutouts
 
-A tiny GitHub Pages shoutout wall. People submit the Google Form, and a Google
-Apps Script trigger commits each response into `data/shoutouts.json`. The site
-loads that JSON and displays every response as a sticky note.
+A tiny GitHub Pages shoutout wall. People submit the Google Form, and the site
+reads the linked Google Sheet response feed directly. Each response appears as a
+sticky note.
 
 ## Deploy the site
 
@@ -21,39 +21,32 @@ The wall will be available at:
 Only the form owner can do this part.
 
 1. Open the form responses in Google Sheets.
-2. In the Sheet, open **Extensions > Apps Script**.
-3. Paste the contents of `google-apps-script/Code.gs`.
-4. In Apps Script, open **Project Settings > Script properties**.
-5. Add a property named `GITHUB_TOKEN`.
-6. Set it to a GitHub fine-grained personal access token with **Contents: Read and write** access to only this repository.
-7. Open **Triggers**.
-8. Add a trigger:
-   - Function: `onFormSubmit`
-   - Event source: `From spreadsheet`
-   - Event type: `On form submit`
-9. Submit a test response.
+2. Click **Share**.
+3. Under **General access**, choose **Anyone with the link**.
+4. Keep the role as **Viewer**.
+5. Click **Done**.
 
-This script already matches the current form questions:
+The site currently reads this response Sheet:
+
+`https://docs.google.com/spreadsheets/d/1cOYX_POgtHxzt_WYxFEv1JxXOwP-9ASPYn1Ze_FCI1Q/edit?gid=84917661`
+
+The site expects these current form questions:
 
 - `your Name`
 - `how much do you want to shout them out`
-- `Untitled Title`
 - `shoutout somebody/something`
 
-If you rename the form questions later, update the title lists in
-`formResponseToShoutout_` so they match the exact Google Form questions.
+If you rename or reorder the form questions later, update `script.js`.
 
 ## If responses still do not show
 
-In Apps Script, open **Executions** and click the failed run. The most common
-issues are:
+The most common issues are:
 
-- `Missing script property: GITHUB_TOKEN`: add the token in **Project Settings > Script properties**.
-- `GitHub API error 401`: the token is wrong or expired.
-- `GitHub API error 403`: the token does not have **Contents: Read and write** access for this repo.
-- No execution appears: the form submit trigger was not created.
+- The response Sheet is not shared as **Anyone with the link: Viewer**.
+- The Sheet ID or tab `gid` changed.
+- The form questions were renamed or reordered.
 
 ## Why visitors cannot delete notes
 
-The page has no delete buttons and no write access to GitHub. New notes are only
-added by the Apps Script trigger, which runs with the form owner's token.
+The page has no delete buttons and the Sheet is shared as viewer-only. Visitors
+can submit the form, but they cannot edit or delete responses in the Sheet.
