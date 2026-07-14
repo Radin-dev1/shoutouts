@@ -5,6 +5,10 @@ const template = document.querySelector("#noteTemplate");
 
 const colors = ["#ffe177", "#ffb3ba", "#b9fbc0", "#a0c4ff", "#ffd6a5", "#cdb4db"];
 const tilts = ["-1.6deg", "1.2deg", "-0.8deg", "1.8deg", "-1.1deg", "0.7deg"];
+const dataUrl =
+  location.hostname.endsWith("github.io")
+    ? "/shoutouts/data/shoutouts.json"
+    : "data/shoutouts.json";
 
 function cleanText(value, fallback = "") {
   return String(value || fallback).trim();
@@ -42,7 +46,7 @@ function renderNote(shoutout, index) {
 
 async function loadWall() {
   try {
-    const response = await fetch(`data/shoutouts.json?ts=${Date.now()}`, {
+    const response = await fetch(`${dataUrl}?ts=${Date.now()}`, {
       cache: "no-store",
     });
 
@@ -77,7 +81,7 @@ async function loadWall() {
     } on the wall.`;
   } catch (error) {
     console.error(error);
-    statusEl.textContent = "The shoutout wall could not load yet.";
+    statusEl.textContent = `The shoutout wall could not load yet: ${error.message}`;
   }
 }
 
