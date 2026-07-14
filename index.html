@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shoutouts</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Community wall</p>
+          <h1>Shoutouts</h1>
+        </div>
+        <a
+          class="form-link"
+          href="https://docs.google.com/forms/d/e/1FAIpQLSeI8YYX57VljfBMWt4N8Aw1HZWY6b0Wpox5RpMOvigXe_qnvw/viewform?usp=dialog"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Add a shoutout
+        </a>
+      </header>
+
+      <section class="status-row" aria-live="polite">
+        <p id="wallStatus">Loading shoutouts...</p>
+      </section>
+
+      <section id="wall" class="wall" aria-label="Shoutout sticky notes"></section>
+    </main>
+
+    <template id="noteTemplate">
+      <article class="note">
+        <p class="message"></p>
+        <footer>
+          <span class="from"></span>
+          <span class="date"></span>
+        </footer>
+      </article>
+    </template>
+
+    <script src="script.js"></script>
+  </body>
+</html>
